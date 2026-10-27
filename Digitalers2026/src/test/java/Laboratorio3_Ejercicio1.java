@@ -5,6 +5,14 @@
  import org.openqa.selenium.support.ui.WebDriverWait; 
  import org.testng.Assert; 
  import org.testng.annotations.*;
+ import java.io.File; 
+ import java.io.FileReader; 
+ import java.io.FileWriter; 
+ import java.io.IOException;
+ import org.apache.commons.io.FileUtils;
+ import org.openqa.selenium.OutputType;
+ import org.openqa.selenium.TakesScreenshot;
+ 
 
 public class Laboratorio3_Ejercicio1 {
 	WebDriver driver;
@@ -35,11 +43,6 @@ public class Laboratorio3_Ejercicio1 {
 	
 	@Test
 	public void loginUsuario() {
-		System.out.println("Esta seria la preuba 1");
-	}
-	
-	@Test
-	public void loginUsuario2() {
 		WebElement nombre = driver.findElement(By.name("name"));
 		WebElement email = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("[data-qa='signup-email']")));
 		WebElement botonRegistro = driver.findElement(By.xpath("//button[@data-qa='signup-button']"));
@@ -52,9 +55,57 @@ public class Laboratorio3_Ejercicio1 {
 		botonRegistro.click(); 
 		
 		Assert.assertEquals(driver.getCurrentUrl(), urlAntes);
+		
 		Assert.assertTrue(nombre.isDisplayed());
 		String estoEsUnTexto = null;
-		Assert.assertNotNull(estoEsUnTexto);
+		Assert.assertNull(estoEsUnTexto);
+		
+	}
+	
+	@Test
+	public void loginUsuario2() {
+		System.out.println("Esta seria la prueba 2");
+	}
+	
+	@Test
+	public void escribirYLeerTexto() throws IOException { 
+		
+		File carpeta = new File("Evidencias");
+		if (!carpeta.exists() && !carpeta.mkdirs()) { 
+			throw new IOException("No se pudo crear Evidencias"); 
+		} 
+		
+		File archivo = new File(carpeta, "nota.txt");
+		
+		try (
+			FileWriter escritor = new FileWriter(archivo)) { 
+			escritor.write("Evidencia de la unidad 22"); 
+		} 
+		
+		try (
+			FileReader lector = new FileReader(archivo)) {
+			int caracter;
+			while ((caracter = lector.read()) != -1) {
+				System.out.print((char) caracter);
+			} 
+		} 
+	}
+	
+	@AfterMethod 
+	public void screenshot() throws IOException { 
+		if (driver == null) {
+		System.out.println("No esxiste un navegador abierto.");
+		return; 
+		}
+		
+		File screen = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+		
+		File imageFile = new File("Evidencias/Test.png");
+		
+		FileUtils.copyFile(screen, imageFile);
+		
+		System.out.println(imageFile.getAbsolutePath());
+		
 	}
 	
 	@AfterMethod
